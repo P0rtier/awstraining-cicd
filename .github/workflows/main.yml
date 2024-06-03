@@ -1,0 +1,48 @@
+name: Hello World
+run-name: Hello ${{ inputs.name }} run
+
+on: 
+  workflow_dispatch:
+    inputs: 
+      name:
+        description: Name of cos tam
+        required: true
+        type: string
+      last_name: 
+        description: Second name of cos tam
+        required: true
+        type: string
+jobs:
+  print_hellow_world:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print name
+        run: | 
+          echo "Hello there ${{ inputs.name }}!"
+  print_last_name:
+    runs-on: ubuntu-latest
+    outputs:
+      characters_length: ${{ steps.characters_length.outputs.length }}
+    steps:
+      - name: Print last_name
+        run: |
+          echo "My last name is ${{ inputs.last_name }}..."
+
+      - name: Count characters
+        id: characters_length
+        run: |
+          last_name="${{ inputs.last_name }}"
+          length=${#last_name}
+          echo "length=$length" >> $GITHUB_OUTPUT
+      - name: Test
+        run: | 
+          echo "Length inside previous steps: ${{ steps.characters_length.outputs.length }}"
+        
+  summary: 
+    runs-on: ubuntu-latest
+    needs: print_last_name 
+    steps:
+      - name: Display summary
+        run: |
+          echo "### Summary - Length of last name ${{ needs.print_last_name.outputs.characters_length }}" >> $GITHUB_STEP_SUMMARY
+    
